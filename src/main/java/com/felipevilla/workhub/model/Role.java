@@ -67,7 +67,5 @@ public class Role {
             return false;
         return true;
     }
-
-    
-    
+ 
 }

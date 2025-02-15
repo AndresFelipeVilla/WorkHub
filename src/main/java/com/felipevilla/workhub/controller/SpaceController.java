@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/workhub/space")
+@RequestMapping("/workhub/spaces")
 public class SpaceController {
 
     private final SpaceService spaceService;
@@ -44,7 +44,7 @@ public class SpaceController {
         return ResponseEntity.ok(space);
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<SpaceDTO>> findAllSpace() throws SpaceNotFoundException {
         List<SpaceDTO> spaces = spaceService.findAll();
         return ResponseEntity.ok(spaces); 
