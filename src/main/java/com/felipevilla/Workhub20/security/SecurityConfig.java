@@ -39,10 +39,10 @@ public class SecurityConfig {
         .httpBasic(org.springframework.security.config.Customizer.withDefaults())
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(http -> {
-            http.requestMatchers(HttpMethod.POST, "/workhub/auth/**").permitAll();
+            http.requestMatchers(HttpMethod.POST, "/workhub/auth/log-in").permitAll();
+            http.requestMatchers(HttpMethod.POST, "/workhub/auth/sign-up").permitAll();
             http.requestMatchers(HttpMethod.GET, "/workhub/method/get").permitAll();
-            http.requestMatchers(HttpMethod.POST, "/workhub/method/post").hasAnyAuthority( "CREATE");
-            http.requestMatchers(HttpMethod.PATCH, "/workhub/patch").hasAuthority("REFACTOR");
+            http.requestMatchers(HttpMethod.PATCH, "/workhub/auth/updateRoles").hasRole("ADMIN");
             http.anyRequest().denyAll();
         })
         .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
