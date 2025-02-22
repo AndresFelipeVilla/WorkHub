@@ -19,11 +19,16 @@ import org.springframework.stereotype.Service;
 import com.felipevilla.Workhub20.dto.AuthCreateUserRequest;
 import com.felipevilla.Workhub20.dto.AuthLoginRequest;
 import com.felipevilla.Workhub20.dto.AuthResponse;
+import com.felipevilla.Workhub20.dto.AuthResponseUpdate;
+import com.felipevilla.Workhub20.dto.AuthUpdateUserRolesRequest;
 import com.felipevilla.Workhub20.model.RoleModel;
 import com.felipevilla.Workhub20.model.UserModel;
+import com.felipevilla.Workhub20.model.Enum.RoleEnum;
 import com.felipevilla.Workhub20.repository.RoleRepository;
 import com.felipevilla.Workhub20.repository.UserRepository;
 import com.felipevilla.Workhub20.security.Util.JwtUtils;
+
+
 
 @Service
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
@@ -90,46 +95,66 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     }
 
-    public AuthResponse createUser(AuthCreateUserRequest authCreateUserRequest){
+    public AuthResponse createUser(AuthCreateUserRequest authCreateUserRequest) {
         String username = authCreateUserRequest.username();
         String password = authCreateUserRequest.password();
-        List<String> roleRequest = authCreateUserRequest.roleRequest().roleListName(); 
-
-        Set<RoleModel> roleModelSet = roleRepository.findRoleModelsByRoleEnumIn(roleRequest).stream().collect(Collectors.toSet());
-
-        if (roleModelSet.isEmpty()) {
-            throw new BadCredentialsException("The role specified does not exist");  
-        }
-
+    
+        // Obtener el rol "ROLE_USER" de la base de datos
+        RoleModel userRole = roleRepository.findByRoleEnum(RoleEnum.USER)
+            .orElseThrow(() -> new BadCredentialsException("Default role USER not found"));
+    
+        Set<RoleModel> roleModelSet = Set.of(userRole);
+    
         UserModel userModel = UserModel.builder()
                 .userName(username)
                 .password(passwordEncoder.encode(password))
-                .roles(roleModelSet)
+                .roles(roleModelSet) // Solo asignamos ROLE_USER
                 .isEnabled(true)
                 .accountNoExpired(true)
                 .accountNoLocked(true)
                 .credentialNoExpired(true)
                 .build();
-
+    
         UserModel userCreated = userRepository.save(userModel);
-
-        ArrayList<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-
-        userCreated.getRoles()
-                .forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
-
-        userCreated.getRoles()
-                .stream()
-                .flatMap(role -> role.getPermissionList().stream())
-                .forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userCreated.getUserName(), userCreated.getPassword(), authorityList);
-
-        String accessToken = jwtUtils.createToken(authentication);
-
-        AuthResponse authResponse = new AuthResponse(userCreated.getUserName(), "User created successfully", accessToken, true);
-
-        return authResponse;
+    
+        String accessToken = jwtUtils.createToken(
+                new UsernamePasswordAuthenticationToken(userCreated.getUserName(), userCreated.getPassword(), 
+                    List.of(new SimpleGrantedAuthority("ROLE_USER")))
+        );
+    
+        return new AuthResponse(userCreated.getUserName(), "User created successfully", accessToken, true);
     }
+    
+    
+    public AuthResponseUpdate updateUserRoles(AuthUpdateUserRolesRequest authUpdateUserRolesRequest) {
+            // Buscar el usuario en la base de datos
+        UserModel user = userRepository.findUserModelByUserName(authUpdateUserRolesRequest.username())
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        // Obtener los nuevos roles desde la base de datos
+        Set<RoleModel> newRoles = roleRepository.findRoleModelsByRoleEnumIn(authUpdateUserRolesRequest.roleListName()).stream()
+            .collect(Collectors.toSet());
+
+        // Verificar si los roles existen
+        if (newRoles.isEmpty()) {
+            throw new IllegalArgumentException("Los roles especificados no existen");
+        }
+
+        // Asignar los nuevos roles al usuario
+        user.setRoles(newRoles);
+
+        // Guardar los cambios en la base de datos
+        userRepository.save(user);
+
+        // Retornar una respuesta con mensaje de éxito y los roles asignados
+        return new AuthResponseUpdate("Roles actualizados correctamente", authUpdateUserRolesRequest.roleListName());
+
+    }
+
+
+    
+
+    
+
 
 }
