@@ -41,9 +41,11 @@ public class SecurityConfig {
         .authorizeHttpRequests(http -> {
             http.requestMatchers(HttpMethod.POST, "/workhub/auth/log-in").permitAll();
             http.requestMatchers(HttpMethod.POST, "/workhub/auth/sign-up").permitAll();
-            http.requestMatchers(HttpMethod.GET, "/workhub/method/get").permitAll();
             http.requestMatchers(HttpMethod.PATCH, "/workhub/auth/updateRoles").hasRole("ADMIN");
-            http.anyRequest().denyAll();
+            http.requestMatchers(HttpMethod.POST, "/workhub/space/save").hasRole("ADMIN");
+            http.requestMatchers(HttpMethod.PUT, "/workhub/space/update/{id}").hasRole("ADMIN");
+            http.requestMatchers(HttpMethod.DELETE, "/workhub/space/delete/{id}").hasRole("ADMIN");
+            http.anyRequest().authenticated();
         })
         .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
         .build();   
