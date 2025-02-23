@@ -127,31 +127,25 @@ public class UserDetailsService implements org.springframework.security.core.use
     
     
     public AuthResponseUpdate updateUserRoles(AuthUpdateUserRolesRequest authUpdateUserRolesRequest) {
-            // Buscar el usuario en la base de datos
+            
         UserModel user = userRepository.findUserModelByUserName(authUpdateUserRolesRequest.username())
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        // Obtener los nuevos roles desde la base de datos
         Set<RoleModel> newRoles = roleRepository.findRoleModelsByRoleEnumIn(authUpdateUserRolesRequest.roleListName()).stream()
             .collect(Collectors.toSet());
 
-        // Verificar si los roles existen
         if (newRoles.isEmpty()) {
             throw new IllegalArgumentException("Los roles especificados no existen");
         }
 
-        // Asignar los nuevos roles al usuario
         user.setRoles(newRoles);
-
-        // Guardar los cambios en la base de datos
         userRepository.save(user);
 
-        // Retornar una respuesta con mensaje de éxito y los roles asignados
         return new AuthResponseUpdate("Roles actualizados correctamente", authUpdateUserRolesRequest.roleListName());
 
     }
 
-
+    
     
 
     
