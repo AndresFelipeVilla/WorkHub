@@ -45,6 +45,11 @@ public class SecurityConfig {
             http.requestMatchers(HttpMethod.POST, "/workhub/space/save").hasRole("ADMIN");
             http.requestMatchers(HttpMethod.PUT, "/workhub/space/update/{id}").hasRole("ADMIN");
             http.requestMatchers(HttpMethod.DELETE, "/workhub/space/delete/{id}").hasRole("ADMIN");
+            http.requestMatchers(
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html"
+            ).permitAll();
             http.anyRequest().authenticated();
         })
         .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
