@@ -63,22 +63,23 @@ WorkHub sigue una arquitectura multicapa para garantizar modularidad y mantenimi
 ## Endpoints principales
 
 ### **Usuarios**
-- `POST /usuarios/registro` → Registro de usuario.
-- `POST /auth/login` → Inicio de sesión y obtención de JWT.
+- `POST /workhub/auth/sign-up` → Registro de usuario.
+- `POST /workhub/auth/log-in` → Inicio de sesión y obtención de JWT.
+- `PUT /workhub/auth/updateRoles` → Edición de roles (Admin).
 
 ### **Espacios**
-- `GET /espacios` → Consulta de espacios disponibles con filtros.
-- `POST /espacios` → Creación de un espacio (Admin).
-- `PUT /espacios/{id}` → Edición de un espacio (Admin).
-- `DELETE /espacios/{id}` → Eliminación de un espacio (Admin).
+- `GET /workhub/spaces` → Consulta de espacios disponibles con filtros.
+- `GET /workhub/spaces{id}` → Consulta un espacio en especifico.
+- `POST /workhub/spaces/save` → Creación de un espacio (Admin).
+- `PUT /workhub/spaces/update/{id}` → Edición de un espacio (Admin).
+- `DELETE /workhub/espacios/delete/{id}` → Eliminación de un espacio (Admin).
 
 ### **Reservas**
-- `POST /reservas` → Crear una reserva.
-- `GET /reservas` → Consultar reservas del usuario autenticado.
-- `DELETE /reservas/{id}` → Cancelar una reserva.
-
-### **Informes**
-- `GET /informes/ocupacion` → Obtener ocupación de espacios por rango de fechas.
+- `POST /workhub/bookings/save` → Crear una reserva.
+- `GET /workhub/bookings/{id}` → Consultar reservas del usuario autenticado.
+- `GET /workhub/bookings/findAll` → Consultar reservas.
+- `PUT /workhub/bookings/update/{id}` → Edicion de reserva.
+- `DELETE /workhub/bookings/delete/{id}` → Cancelar una reserva.
 
 ---
 
@@ -97,7 +98,7 @@ $ mvn spring-boot:run
 ```
 
 ### **3. Acceso a la API**
-- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8082/swagger-ui.html)
+- Swagger UI: [http://localhost:8082/swagger-ui.html](http://localhost:8082/swagger-ui.html)
 
 
 
