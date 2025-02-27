@@ -1,7 +1,7 @@
 # WorkHub - API de Gestión de Reservas de Espacios Coworking
 
 ## Descripción
-WorkHub es una API RESTful diseñada para gestionar de manera eficiente las reservas en un espacio de coworking. Este sistema permite la administración de usuarios, espacios y reservas, además de generar informes sobre la ocupación de los espacios.
+WorkHub es una API RESTful diseñada para gestionar de manera eficiente las reservas en un espacio de coworking. Este sistema permite la administración de usuarios, espacios y reservas.
 
 ---
 
